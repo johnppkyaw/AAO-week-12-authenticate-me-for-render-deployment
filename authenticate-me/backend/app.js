@@ -39,6 +39,7 @@ app.use(
 app.use(
   csurf({
     cookie: {
+      name: 'XSRF-TOKEN',
       secure: isProduction,
       sameSite: isProduction && "Lax",
       httpOnly: true
