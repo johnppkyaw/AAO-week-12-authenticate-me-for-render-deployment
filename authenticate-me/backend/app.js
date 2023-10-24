@@ -36,6 +36,7 @@ app.use(
 );
 
 // Set the _csrf token and create req.csrfToken method
+//make sure requests are not forged
 app.use(
   csurf({
     cookie: {
