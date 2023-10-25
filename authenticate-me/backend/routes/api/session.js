@@ -3,10 +3,26 @@ const express = require('express');
 const { setTokenCookie, restoreUser } = require('../../utils/auth');
 const { User } = require('../../db/models');
 
+//import check function from express-validator
+const { check } = require('express-validator');
+const { handleValidationErrors } = require('../../utils/validation');
+
 const router = express.Router();
 
+//an array of middlewares that are executed in the order they appear in the array
+const validateLogin = [
+  check('credential')
+    .exists({ checkFalsy: true }) //check if the field exists; does not care about empty string or whitespace.
+    .notEmpty() //check if the field is not empty
+    .withMessage('Please provide a valid email or username.'),
+  check('password')
+    .exists({ checkFalsy: true})
+    .withMessage('Please provide a password.'),
+  handleValidationErrors //error-handling midleware
+];
+
 //log in
-router.post('/', async (req, res, next) => {
+router.post('/', validateLogin, async (req, res, next) => {
   const { credential, password } = req.body;
   const user = await User.login({credential, password});
 
@@ -43,5 +59,7 @@ router.get('/', restoreUser, (req, res) => {
     return res.json({});
   }
 })
+
+
 
 module.exports = router;
